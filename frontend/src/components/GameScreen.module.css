@@ -1,0 +1,127 @@
+.page {
+  width: 100%;
+  max-width: 1220px;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid rgba(233, 228, 214, 0.12);
+  padding-bottom: 16px;
+  margin-bottom: 22px;
+}
+
+.topLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.backButton {
+  cursor: pointer;
+  border: 1px solid rgba(233, 228, 214, 0.2);
+  background: transparent;
+  padding: 8px 16px;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: rgba(233, 228, 214, 0.7);
+  font-family: inherit;
+}
+
+.backButton:hover {
+  border-color: var(--jade);
+  color: var(--jade);
+}
+
+.brand {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.modeLabel {
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: rgba(233, 228, 214, 0.4);
+}
+
+.status {
+  font-size: 14px;
+  letter-spacing: 0.16em;
+}
+
+.statusRed {
+  color: var(--rust);
+}
+
+.statusBlue {
+  color: var(--jade);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 240px) auto minmax(0, 260px);
+  gap: 24px;
+  justify-content: center;
+  align-items: start;
+}
+
+.sideColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.button {
+  cursor: pointer;
+  padding: 11px 22px;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  border: 1px solid rgba(233, 228, 214, 0.2);
+  color: rgba(233, 228, 214, 0.72);
+  background: transparent;
+  font-family: inherit;
+}
+
+.button:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+
+.button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.buttonPrimary {
+  border-color: var(--jade);
+  color: var(--jade);
+  background: rgba(127, 214, 178, 0.1);
+}
+
+.aiError {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--warn);
+  margin-top: 10px;
+  text-align: center;
+  max-width: 560px;
+}

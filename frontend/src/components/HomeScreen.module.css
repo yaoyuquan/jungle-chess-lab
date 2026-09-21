@@ -1,0 +1,259 @@
+.page {
+  width: 100%;
+  max-width: 1040px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  gap: 22px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid rgba(233, 228, 214, 0.12);
+  padding-bottom: 26px;
+}
+
+.title {
+  font-family: var(--serif);
+  font-weight: 900;
+  font-size: 76px;
+  line-height: 0.95;
+  letter-spacing: 0.06em;
+  background: linear-gradient(160deg, #f2e9d2 10%, #7fd6b2 60%, #b0342c 130%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.subtitleWrap {
+  padding-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 12px;
+  letter-spacing: 0.42em;
+  color: var(--jade);
+  text-transform: uppercase;
+}
+
+.chain {
+  font-size: 14px;
+  color: rgba(233, 228, 214, 0.6);
+  margin-top: 6px;
+}
+
+.modeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 30px;
+}
+
+.modeCard {
+  cursor: pointer;
+  padding: 24px 26px;
+  border: 1px solid rgba(233, 228, 214, 0.13);
+  background: rgba(255, 255, 255, 0.028);
+  transition: all 0.2s;
+  position: relative;
+  text-align: left;
+  color: inherit;
+  font-family: inherit;
+}
+
+.modeCard:hover {
+  filter: brightness(1.12);
+}
+
+.modeCardActive {
+  border-color: var(--jade);
+  background: rgba(127, 214, 178, 0.09);
+}
+
+.modeTitle {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.modeDesc {
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(233, 228, 214, 0.62);
+  margin-top: 8px;
+}
+
+.modeTag {
+  margin-top: 16px;
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  padding: 5px 10px;
+  color: rgba(233, 228, 214, 0.5);
+  background: rgba(233, 228, 214, 0.08);
+}
+
+.modeTagActive {
+  color: #08130f;
+  background: var(--jade);
+}
+
+.section {
+  margin-top: 34px;
+}
+
+.sectionLabel {
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  color: rgba(233, 228, 214, 0.45);
+  margin-bottom: 14px;
+}
+
+.sideRow {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sideCard {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 13px 24px;
+  font-size: 14px;
+  border: 1px solid rgba(233, 228, 214, 0.13);
+  background: rgba(255, 255, 255, 0.028);
+  color: inherit;
+  font-family: inherit;
+}
+
+.sideCard:hover {
+  filter: brightness(1.1);
+}
+
+.sideCardActive {
+  border-color: var(--jade);
+  background: rgba(127, 214, 178, 0.1);
+}
+
+.dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.dotRed {
+  background: var(--rust);
+}
+
+.dotBlue {
+  background: var(--jade);
+}
+
+.selectWrap {
+  max-width: 420px;
+}
+
+.select {
+  width: 100%;
+  appearance: none;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(233, 228, 214, 0.18);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  padding: 14px 18px;
+  border-radius: 2px;
+  outline: none;
+}
+
+.select option {
+  background: #141b19;
+  color: var(--ink);
+}
+
+.selectRed {
+  background: rgba(229, 139, 121, 0.07);
+  border-color: rgba(229, 139, 121, 0.35);
+}
+
+.selectBlue {
+  background: rgba(127, 214, 178, 0.07);
+  border-color: rgba(127, 214, 178, 0.35);
+}
+
+.hint {
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(233, 228, 214, 0.5);
+  margin-top: 10px;
+  min-height: 20px;
+}
+
+.watchGrid {
+  margin-top: 34px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 26px;
+  max-width: 860px;
+}
+
+.watchLabelRed {
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  color: var(--rust);
+  margin-bottom: 14px;
+}
+
+.watchLabelBlue {
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  color: var(--jade);
+  margin-bottom: 14px;
+}
+
+.source {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  margin-top: 18px;
+  color: rgba(233, 228, 214, 0.35);
+}
+
+.sourceError {
+  color: var(--warn);
+}
+
+.footer {
+  margin-top: 36px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.startButton {
+  cursor: pointer;
+  background: linear-gradient(120deg, #7fd6b2, #3f9c7c);
+  color: #08130f;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.14em;
+  padding: 16px 42px;
+  border: none;
+  border-radius: 2px;
+  box-shadow: 0 12px 30px rgba(63, 156, 124, 0.28);
+  font-family: inherit;
+}
+
+.startButton:hover {
+  filter: brightness(1.08);
+}
+
+.rules {
+  font-size: 12px;
+  color: rgba(233, 228, 214, 0.4);
+  line-height: 1.8;
+  max-width: 420px;
+}

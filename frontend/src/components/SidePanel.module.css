@@ -1,0 +1,83 @@
+.panel {
+  padding: 16px;
+  border: 1px solid rgba(233, 228, 214, 0.1);
+  background: rgba(255, 255, 255, 0.035);
+  transition: border-color 0.3s;
+}
+
+.panelActiveRed {
+  border-color: rgba(229, 139, 121, 0.55);
+}
+
+.panelActiveBlue {
+  border-color: rgba(127, 214, 178, 0.55);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.name {
+  font-family: var(--serif);
+  font-size: 18px;
+}
+
+.nameRed {
+  color: var(--rust);
+}
+
+.nameBlue {
+  color: var(--jade);
+}
+
+.role {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: rgba(233, 228, 214, 0.45);
+}
+
+.model {
+  font-size: 13px;
+  color: rgba(233, 228, 214, 0.75);
+  margin-top: 8px;
+}
+
+.desc {
+  font-size: 11px;
+  color: rgba(233, 228, 214, 0.45);
+  margin-top: 4px;
+  line-height: 1.6;
+}
+
+.captured {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+  min-height: 26px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-family: var(--serif);
+  font-size: 13px;
+}
+
+.chipRed {
+  color: var(--rust);
+  border: 1px solid #e58b7955;
+  background: #e58b7914;
+}
+
+.chipBlue {
+  color: var(--jade);
+  border: 1px solid #7fd6b255;
+  background: #7fd6b214;
+}
