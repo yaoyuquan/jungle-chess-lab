@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { GameScreen } from './components/GameScreen';
 import { HomeScreen } from './components/HomeScreen';
 import type { Side } from './game/types';
@@ -11,12 +11,14 @@ function GameRoute({
   setup,
   players,
   onBack,
+  onAbort,
 }: {
   setup: GameSetup;
   players: ReturnType<typeof useModels>['players'];
   onBack: () => void;
+  onAbort: (reason: string) => void;
 }) {
-  const game = useGame(setup);
+  const game = useGame(setup, onAbort);
   return <GameScreen setup={setup} game={game} players={players} onBack={onBack} />;
 }
 
@@ -34,6 +36,8 @@ export function App() {
   const [bluePlayerId, setBluePlayerId] = useState('');
   // 每次开局自增，用作对局页的 key，确保新局从干净状态开始
   const [round, setRound] = useState(0);
+  // 对局被中止时带回首页的提示语
+  const [notice, setNotice] = useState<string | null>(null);
 
   // 棋手清单到位后填默认选项：人机默认第一位，观战默认两个席位各占一方
   useEffect(() => {
@@ -58,9 +62,16 @@ export function App() {
   }, [mode, playerSide, pvePlayerId, redPlayerId, bluePlayerId]);
 
   const startGame = () => {
+    setNotice(null);
     setRound((n) => n + 1);
     setScreen('game');
   };
+
+  // AI 那一步要不到就中止对局：回首页，把原因摆出来，不在棋盘上兜底
+  const abortGame = useCallback((reason: string) => {
+    setNotice(reason);
+    setScreen('home');
+  }, []);
 
   return (
     <div className="app-shell">
@@ -74,6 +85,7 @@ export function App() {
           players={players}
           loading={loading}
           error={error}
+          notice={notice}
           onModeChange={setMode}
           onSideChange={setPlayerSide}
           onPvePlayerChange={setPvePlayerId}
@@ -87,6 +99,7 @@ export function App() {
           setup={setup}
           players={players}
           onBack={() => setScreen('home')}
+          onAbort={abortGame}
         />
       )}
     </div>

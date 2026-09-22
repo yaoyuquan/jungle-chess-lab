@@ -24,16 +24,17 @@ npx tsc --noEmit                  # 只做类型检查
 
 - **规则只有一份实现，在 `src/game/`。** 走法生成、吃子判定、胜负判定都不要指望后端。
   后端 `FallbackPicker` 里那套子力价值只服务于它的兜底启发式，不是规则。
-- **对局永远走得下去**，三层兜底，任何一层都不该被"顺手"去掉：
+- **前端一律不兜底**。棋盘上只允许出现模型真正下的棋，要不到就中止对局，别"顺手"加降级：
 
-| 情形 | 兜在哪 |
+| 情形 | 怎么处理 |
 |---|---|
-| 模型返回越界编号 / 调用失败 / 没配密钥 | 后端启发式，响应 `fallback: true` |
-| 后端整个不可用 | `useGame` 的 `.catch()` 就地随机落子 |
-| 棋手清单拉不到 | `useModels.FALLBACK_PLAYERS` 内置清单 |
+| 棋手清单拉不到 / 清单为空 | `useModels` 返回空清单 + error，首页横幅提示，「开始对局」置灰 |
+| AI 请求失败（后端没起、非 2xx） | `useGame` 的 `.catch()` 调 `onAbort` |
+| 响应 `fallback: true`（后端启发式接管） | 同样 `onAbort`，那是启发式的棋不是模型的棋 |
+| 响应 `index` 越界 | 同样 `onAbort` |
 
-另外 `commit(legal[res.index] ?? legal[0], …)` 那个 `?? legal[0]` 也是兜底的一环：
-后端承诺 `index` 必定合法，但前端不拿这个承诺赌一次崩溃。
+`onAbort` 由 `App.abortGame` 接住：切回首页 + 把原因写进 `notice` 横幅。
+它存在 `abortGameRef` 里而不进 effect 依赖，免得回调换了引用就把 AI 回合重跑一遍。
 
 ## 代码地图
 
@@ -42,7 +43,7 @@ src/
 ├── game/          规则引擎，纯函数，不碰 React 也不碰网络
 │   ├── types.ts       Side / Rank / Piece / Pos / Board / Move
 │   ├── terrain.ts     isWater / isDen / trapOf / denOf / inBoard
-│   ├── constants.ts   ROWS / COLS / NAMES 兽名 / VAL 子力价值 / opposite
+│   ├── constants.ts   ROWS / COLS / NAMES 兽名 / SIDE_NAMES / opposite
 │   ├── coord.ts       toCoord：棋盘坐标 → 棋谱坐标（(0,3) → D9）
 │   ├── rules.ts       initBoard / canCapture / genMoves / apply / winnerOf / resolveWinner
 │   │                  / describeMove
@@ -79,7 +80,8 @@ src/
 - **不要给 AI 请求加超时。** 后端调模型不设超时也不重试，推理型模型一手 170–220s 是常态。
   只在开新局 / 悔棋 / 卸载时主动 abort（`useGame.cancelPending`），靠 `runIdRef` 丢弃在途响应。
 - **响应的 `index` 是着法的 `i` 值，不是数组下标。** 现在前端按 0 起连续编号，两者恰好一致，
-  真要改成不连续编号，`commit(legal[res.index])` 这行得跟着改成按 `i` 查找。
+  真要改成不连续编号，`legal[res.index]` 那行得跟着改成按 `i` 查找。
+- **`fallback: true` 按失败处理。** 后端此时给的是启发式着法而非模型判断，前端中止对局回首页。
 - 后端地址只出现在 `vite.config.ts` 的 proxy 里，**代码里不许写死域名或端口**。
 
 ## 改动时要守的几条

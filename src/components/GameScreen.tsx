@@ -24,7 +24,7 @@ const SPEED_BUTTONS: Array<{ label: string; value: number }> = [
  * 对局页：左侧双方面板、中间棋盘、右侧对局记录。
  */
 export function GameScreen({ setup, game, players, onBack }: Props) {
-  const { state, thinking, paused, speed, aiError } = game;
+  const { state, thinking, paused, speed } = game;
   const { mode, playerSide } = setup;
 
   const findPlayer = (id: string) => players.find((p) => p.id === id);
@@ -140,12 +140,6 @@ export function GameScreen({ setup, game, players, onBack }: Props) {
               重新开局
             </button>
           </div>
-
-          {aiError && (
-            <div className={styles.aiError}>
-              AI 服务调用失败（{aiError}），当前由前端随机落子维持对局。
-            </div>
-          )}
         </div>
 
         <MoveLog log={state.log} />

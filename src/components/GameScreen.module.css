@@ -117,11 +117,3 @@
   background: rgba(127, 214, 178, 0.1);
 }
 
-.aiError {
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  color: var(--warn);
-  margin-top: 10px;
-  text-align: center;
-  max-width: 560px;
-}

@@ -24,7 +24,6 @@ export interface LogEntry {
   move: string;
   cap: string;
   reason?: string;
-  fallback?: boolean;
 }
 
 interface Snapshot {
@@ -85,7 +84,6 @@ export interface UseGameResult {
   thinking: boolean;
   paused: boolean;
   speed: number;
-  aiError: string | null;
   onCell: (r: number, c: number) => void;
   undo: () => void;
   restart: () => void;
@@ -96,15 +94,21 @@ export interface UseGameResult {
 
 /**
  * 对局状态机。规则判定全部在本地完成，只有「AI 选哪一步」需要问后端。
+ *
+ * AI 这一步要不到（后端不可用、或后端只给出了启发式兜底着法）就中止对局，
+ * 交给 onAbort 回首页提示。宁可不下，也不拿随机落子冒充模型的棋。
  */
-export function useGame(setup: GameSetup): UseGameResult {
+export function useGame(setup: GameSetup, onAbort: (reason: string) => void): UseGameResult {
   const { mode, playerSide, redPlayerId, bluePlayerId } = setup;
 
   const [state, setState] = useState<GameState>(freshState);
   const [paused, setPaused] = useState(false);
   const [speed, setSpeed] = useState<number>(SPEEDS.normal);
   const [thinking, setThinking] = useState(false);
-  const [aiError, setAiError] = useState<string | null>(null);
+
+  // 放进 ref，免得回调换了引用就把 AI 回合的 effect 重新跑一遍
+  const abortGameRef = useRef(onAbort);
+  abortGameRef.current = onAbort;
 
   // 每次开局 / 悔棋都会让 runId 自增，用来丢弃在途的 AI 响应
   const runIdRef = useRef(0);
@@ -119,7 +123,7 @@ export function useGame(setup: GameSetup): UseGameResult {
   }, []);
 
   /** 落子并推进对局 */
-  const commit = useCallback((mv: Move, extra?: { reason?: string; fallback?: boolean }) => {
+  const commit = useCallback((mv: Move, extra?: { reason?: string }) => {
     setState((s) => {
       const piece = s.board[mv.f[0]][mv.f[1]];
       if (!piece) return s;
@@ -139,7 +143,6 @@ export function useGame(setup: GameSetup): UseGameResult {
           move: `${toCoord(mv.f)} → ${toCoord(mv.t)}`,
           cap,
           reason: extra?.reason,
-          fallback: extra?.fallback,
         },
       ]);
       const hist = s.hist
@@ -195,18 +198,23 @@ export function useGame(setup: GameSetup): UseGameResult {
       )
         .then((res) => {
           if (runId !== runIdRef.current || controller.signal.aborted) return;
-          setAiError(null);
-          commit(legal[res.index] ?? legal[0], { reason: res.reason, fallback: res.fallback });
+          // 后端启发式接管说明模型这一手没决策成功，不拿它顶替模型的棋
+          if (res.fallback) {
+            abortGameRef.current('模型未能给出着法，后端已改用启发式兜底，对局中止。');
+            return;
+          }
+          const mv = legal[res.index];
+          // 后端承诺 index 必定合法，但不拿这个承诺赌一次崩溃
+          if (!mv) {
+            abortGameRef.current(`后端返回的着法编号 ${res.index} 越界，对局中止。`);
+            return;
+          }
+          commit(mv, { reason: res.reason });
         })
         .catch((e: unknown) => {
           if (runId !== runIdRef.current || controller.signal.aborted) return;
-          // 后端彻底不可用时就地随机落子，保证观战不会停死
           const message = e instanceof Error ? e.message : String(e);
-          setAiError(message);
-          commit(legal[Math.floor(Math.random() * legal.length)], {
-            reason: `AI 服务不可用（${message}），本地随机落子。`,
-            fallback: true,
-          });
+          abortGameRef.current(`AI 服务不可用（${message}），对局中止。`);
         })
         .finally(() => {
           if (runId === runIdRef.current) setThinking(false);
@@ -283,7 +291,6 @@ export function useGame(setup: GameSetup): UseGameResult {
   const restart = useCallback(() => {
     cancelPending();
     setPaused(false);
-    setAiError(null);
     setState(freshState());
   }, [cancelPending]);
 
@@ -292,7 +299,6 @@ export function useGame(setup: GameSetup): UseGameResult {
     thinking: thinking && !(mode === 'watch' && paused),
     paused,
     speed,
-    aiError,
     onCell,
     undo,
     restart,

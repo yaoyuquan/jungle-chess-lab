@@ -13,6 +13,7 @@ interface Props {
   players: AiPlayer[];
   loading: boolean;
   error: string | null;
+  notice: string | null;
   onModeChange: (mode: GameMode) => void;
   onSideChange: (side: Side) => void;
   onPvePlayerChange: (id: string) => void;
@@ -31,7 +32,7 @@ const SIDE_CARDS: Array<{ id: Side; label: string }> = [
   { id: 'r', label: '红方 · 后手' },
 ];
 
-/** 棋手下拉框。加载中时禁用并显示占位项 */
+/** 棋手下拉框。加载中或清单为空时禁用并显示占位项 */
 function PlayerSelect({
   value,
   players,
@@ -47,15 +48,18 @@ function PlayerSelect({
 }) {
   const variantClass =
     variant === 'red' ? styles.selectRed : variant === 'blue' ? styles.selectBlue : '';
+  const empty = !loading && players.length === 0;
   return (
     <select
       className={`${styles.select} ${variantClass}`}
-      value={loading ? '' : value}
-      disabled={loading}
+      value={loading || empty ? '' : value}
+      disabled={loading || empty}
       onChange={(e) => onChange(e.target.value)}
     >
       {loading ? (
         <option value="">模型加载中…</option>
+      ) : empty ? (
+        <option value="">暂无可用棋手</option>
       ) : (
         players.map((p) => (
           <option key={p.id} value={p.id}>
@@ -80,6 +84,7 @@ export function HomeScreen(props: Props) {
     players,
     loading,
     error,
+    notice,
     onModeChange,
     onSideChange,
     onPvePlayerChange,
@@ -88,11 +93,15 @@ export function HomeScreen(props: Props) {
     onStart,
   } = props;
 
-  const sourceText = loading
-    ? ''
+  // 没有棋手就开不了局：不再有内置清单顶上
+  const ready = !loading && players.length > 0;
+  const sourceText = loading ? '' : `模型清单来自后台接口 ${MODELS_API}。`;
+  // 上一局被中止的原因优先显示，其次才是清单拉取失败
+  const alertText = notice
+    ? notice
     : error
-      ? `模型接口 ${MODELS_API} 未响应，当前使用内置演示清单。`
-      : `模型清单来自后台接口 ${MODELS_API}。`;
+      ? `模型清单拉取失败（${error}），请确认 AI 服务已启动后刷新页面。`
+      : '';
 
   return (
     <div className={`${styles.page} rise-in`}>
@@ -182,12 +191,19 @@ export function HomeScreen(props: Props) {
               />
             </div>
           </div>
-          <div className={`${styles.source} ${error ? styles.sourceError : ''}`}>{sourceText}</div>
+          <div className={styles.source}>{sourceText}</div>
         </>
       )}
 
+      {alertText && <div className={styles.alert}>{alertText}</div>}
+
       <div className={styles.footer}>
-        <button type="button" className={styles.startButton} onClick={onStart}>
+        <button
+          type="button"
+          className={styles.startButton}
+          onClick={onStart}
+          disabled={!ready}
+        >
           {mode === 'watch' ? '开始观战' : '开始对局'}
         </button>
         <div className={styles.rules}>

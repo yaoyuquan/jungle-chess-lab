@@ -26,7 +26,6 @@ export function MoveLog({ log }: Props) {
             </span>
             <span className={styles.move}>{entry.move}</span>
             {entry.cap && <span className={styles.cap}>{entry.cap}</span>}
-            {entry.fallback && <span className={styles.fallback}>兜底</span>}
           </div>
         ))}
         {log.length === 0 && <div className={styles.empty}>尚无着法。蓝方先行。</div>}

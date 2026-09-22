@@ -221,8 +221,16 @@
   color: rgba(233, 228, 214, 0.35);
 }
 
-.sourceError {
+.alert {
+  margin-top: 24px;
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.7;
   color: var(--warn);
+  border: 1px solid rgba(217, 168, 106, 0.35);
+  background: rgba(217, 168, 106, 0.08);
+  border-radius: 2px;
+  max-width: 520px;
 }
 
 .footer {
@@ -247,8 +255,14 @@
   font-family: inherit;
 }
 
-.startButton:hover {
+.startButton:hover:not(:disabled) {
   filter: brightness(1.08);
+}
+
+.startButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .rules {
