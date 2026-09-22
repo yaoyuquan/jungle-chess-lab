@@ -2,6 +2,12 @@ import type { AiMoveRequest, AiMoveResponse, AiPlayer } from './types';
 
 const BASE = '/api';
 
+/**
+ * 着法决策的路径带棋种，斗兽棋是 /api/jungle/ai/；
+ * 棋手清单与棋种无关，留在 /api/ai/models。
+ */
+const JUNGLE = '/jungle';
+
 /** 统一的 JSON 请求。非 2xx 时尽量带上后端给的 message */
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
@@ -28,7 +34,7 @@ export function listPlayers(signal?: AbortSignal): Promise<AiPlayer[]> {
 
 /** 请求 AI 在候选着法中选一条 */
 export function requestAiMove(payload: AiMoveRequest, signal?: AbortSignal): Promise<AiMoveResponse> {
-  return request<AiMoveResponse>('/ai/move', {
+  return request<AiMoveResponse>(`${JUNGLE}/ai/move`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
