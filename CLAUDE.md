@@ -6,7 +6,7 @@ AI 服务（Java 25 + Spring Boot 4）在另一个仓库 `chess-lab-server`，�
 ## 常用命令
 
 ```bash
-npm test                          # 24 个规则单测（vitest），纯函数，不需要后端
+npm test                          # 规则 + 存档单测（vitest），纯函数，不需要后端
 npm run test:watch
 npm run dev                       # 5173，/api 代理到 localhost:8080
 npm run build                     # tsc -b + vite build
@@ -54,6 +54,8 @@ src/
 ├── hooks/
 │   ├── useGame.ts     对局状态机：落子、悔棋、AI 回合调度、在途请求取消
 │   └── useModels.ts   棋手清单 + 降级
+├── storage/
+│   └── savedGame.ts   进行中对局的 localStorage 存档，F5 刷新后恢复
 └── components/    HomeScreen（选模式/阵营/棋手）、GameScreen、Board、SidePanel、MoveLog
                    每个组件配一个同名 .module.css
 ```
@@ -94,6 +96,10 @@ src/
   点击回调、着法高亮、对局记录都不做换算。别把翻转下沉到 `game/` 里。
 - **`useGame` 的 `key` 重置法**：`App` 用自增的 `round` 当 `GameRoute` 的 key，
   开新局靠整个 hook 重建，而不是手动把状态一项项清空。加新状态时不用管重置。
+- **对局存档**：`useGame` 每次状态变化都写 localStorage，`App` 启动时读到存档就直接进对局页。
+  点「返回」或对局中止时清档；分出胜负不清，刷新还能看到终局。在途的 AI 请求不入档，
+  恢复后若轮到 AI 会重新请求。悔棋快照的 `log` 只存长度（必为当前记录的前缀），别改成存全量。
+  存档结构变了就升 `VERSION`，旧档直接作废。
 - 历史栈上限 `HISTORY_LIMIT = 60`，悔棋一次回退到**上一次轮到玩家**的局面（跳过 AI 那手）。
 
 ## 代码规约

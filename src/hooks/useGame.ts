@@ -5,6 +5,8 @@ import { NAMES, opposite } from '../game/constants';
 import { toCoord } from '../game/coord';
 import { apply, describeMove, genMoves, initBoard, resolveWinner } from '../game/rules';
 import { isDen } from '../game/terrain';
+import type { SavedGame } from '../storage/savedGame';
+import { saveGame } from '../storage/savedGame';
 import type { Board, Move, Side } from '../game/types';
 
 export type GameMode = 'pve' | 'watch';
@@ -97,14 +99,25 @@ export interface UseGameResult {
  *
  * AI 这一步要不到（后端不可用、或后端只给出了启发式兜底着法）就中止对局，
  * 交给 onAbort 回首页提示。宁可不下，也不拿随机落子冒充模型的棋。
+ *
+ * 传入 restored 时从存档接着下。只在挂载时读一次，之后每次变化都写回存档。
  */
-export function useGame(setup: GameSetup, onAbort: (reason: string) => void): UseGameResult {
+export function useGame(
+  setup: GameSetup,
+  onAbort: (reason: string) => void,
+  restored?: SavedGame | null,
+): UseGameResult {
   const { mode, playerSide, redPlayerId, bluePlayerId } = setup;
 
-  const [state, setState] = useState<GameState>(freshState);
-  const [paused, setPaused] = useState(false);
-  const [speed, setSpeed] = useState<number>(SPEEDS.normal);
+  const [state, setState] = useState<GameState>(() => restored?.state ?? freshState());
+  const [paused, setPaused] = useState(restored?.paused ?? false);
+  const [speed, setSpeed] = useState<number>(restored?.speed ?? SPEEDS.normal);
   const [thinking, setThinking] = useState(false);
+
+  // 在途的 AI 请求不入档：刷新时它随页面一起丢了，恢复后若轮到 AI，下面的 effect 会重新发起
+  useEffect(() => {
+    saveGame({ setup, state, paused, speed });
+  }, [setup, state, paused, speed]);
 
   // 放进 ref，免得回调换了引用就把 AI 回合的 effect 重新跑一遍
   const abortGameRef = useRef(onAbort);
