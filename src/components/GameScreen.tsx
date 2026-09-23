@@ -1,6 +1,7 @@
 import type { AiPlayer } from '../api/types';
 import type { GameSetup, UseGameResult } from '../hooks/useGame';
 import { SPEEDS } from '../hooks/useGame';
+import { SIDE_NAMES } from '../game/constants';
 import type { Side } from '../game/types';
 import { Board } from './Board';
 import { MoveLog } from './MoveLog';
@@ -54,6 +55,29 @@ export function GameScreen({ setup, game, players, onBack }: Props) {
     statusText = `${state.turn === 'r' ? '红方' : '蓝方'}${thinking ? ' 思考中…' : ' 行棋'}`;
     statusClass = state.turn === 'r' ? styles.statusRed : styles.statusBlue;
   }
+
+  // 复制出去的棋谱要能脱离页面单独看懂，所以把模式、双方棋手、结果都带上；
+  // AI 的落子理由页面上只在悬停时可见，复制时一并写出
+  const buildRecordText = () => {
+    const playerLine = (side: Side) => {
+      const info = side === 'r' ? red : blue;
+      return `${SIDE_NAMES[side]}：${info.modelName}（${info.role}）`;
+    };
+    const result = state.winner ? `${SIDE_NAMES[state.winner]}胜` : '未分胜负';
+    const lines = [
+      `斗兽棋 · ${mode === 'watch' ? 'AI 观战' : '人机对战'}`,
+      playerLine('r'),
+      playerLine('b'),
+      `结果：${result}（共 ${state.log.length} 手）`,
+      '',
+    ];
+    state.log.forEach((entry, i) => {
+      const cap = entry.cap ? ` ${entry.cap}` : '';
+      lines.push(`${i + 1}. ${SIDE_NAMES[entry.side]} ${entry.char} ${entry.move}${cap}`);
+      if (entry.reason) lines.push(`   理由：${entry.reason}`);
+    });
+    return lines.join('\n');
+  };
 
   const interactive = mode === 'pve' && !state.winner && state.turn === playerSide;
 
@@ -142,7 +166,7 @@ export function GameScreen({ setup, game, players, onBack }: Props) {
           </div>
         </div>
 
-        <MoveLog log={state.log} />
+        <MoveLog log={state.log} getCopyText={buildRecordText} />
       </div>
     </div>
   );

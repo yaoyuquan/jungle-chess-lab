@@ -4,11 +4,42 @@
   padding: 16px;
 }
 
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
 .title {
   font-size: 11px;
   letter-spacing: 0.3em;
   color: rgba(233, 228, 214, 0.4);
-  margin-bottom: 12px;
+}
+
+.copyButton {
+  cursor: pointer;
+  padding: 3px 10px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  border: 1px solid rgba(233, 228, 214, 0.2);
+  color: rgba(233, 228, 214, 0.6);
+  background: transparent;
+  font-family: inherit;
+}
+
+.copyButton:hover:not(:disabled) {
+  filter: brightness(1.25);
+}
+
+.copyButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.copyFail {
+  color: var(--rust);
+  border-color: #e58b7955;
 }
 
 .list {
